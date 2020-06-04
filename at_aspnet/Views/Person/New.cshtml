@@ -1,0 +1,27 @@
+﻿
+@{
+    ViewData["Title"] = "New";
+}
+
+@model Person
+
+<h1>Add a new person</h1>
+
+<form method="post" asp-action="Save" asp-controller="Person">
+
+    <div class="form-group">
+        <label for="textFirstName">First name:</label>
+        <input type="text" asp-for="FirstName" />
+        <span asp-validation-for="FirstName"></span>
+
+        <label for="textSurname">Surname:</label>
+        <input type="text" asp-for="Surname" />
+        <span asp-validation-for="Surname"></span>
+
+        <label for="textBirthday">Birthday:</label>
+        <input type="date" asp-for="Birthday" />
+        <span asp-validation-for="Birthday"></span>
+    </div>
+
+    <button type="submit" class="btn btn-outline-dark btn-sm">Submit</button>
+</form>

@@ -1,0 +1,45 @@
+﻿
+@{
+    ViewData["Title"] = "Search";
+}
+
+<h1>Search for people</h1>
+
+@if (!String.IsNullOrEmpty(ViewBag.Message))
+{
+
+    <div class="alert @ViewBag.Type" role="alert" id="divAlert">
+        <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <strong>Success!</strong> @ViewBag.Message
+    </div>
+
+    <script>
+        window.setTimeout(function () {
+            $(".alert").fadeTo(500, 0).slideUp(500, function () {
+                $(this).remove();
+            });
+        }, 3000);
+    </script>
+
+}
+
+@model Person
+
+<div>
+
+</div>
+
+<form method="post" asp-action="SearchPeople" asp-controller="Person">
+
+    <div class="form-group">
+        <label for="textFirstName">First name:</label>
+        <input type="text" asp-for="FirstName" />
+        <span asp-validation-for="FirstName"></span>
+
+        <label for="textSurname">Surname:</label>
+        <input type="text" asp-for="Surname" />
+        <span asp-validation-for="Surname"></span>
+    </div>
+
+    <button type="submit" class="btn btn-outline-dark btn-sm">Submit</button>
+</form>
