@@ -1,6 +1,6 @@
 ﻿
 @{
-    ViewData["Title"] = "Index";
+    ViewData["Title"] = "List";
 }
 
 @model List<Person>
@@ -21,50 +21,29 @@
     </script>
 }
 
-<div style="margin-top: 50px; text-align: center;">
-    <a class="btn btn-outline-dark btn-md" asp-controller="Person" asp-action="New">New Person</a>
-</div>
-
-<h3 style="margin-top:25px;">Today's Birthdays</h3>
+<h3 style="margin-top: 25px;">List People</h3>
 <hr />
+
 <table class="table table-dark table-bordered table-hover table-responsive-sm" style="text-align:center;" width="100%" border="1">
     <thead>
         <tr>
             <th>Name</th>
             <th>Birthday</th>
             <th>Age <sup>Year(s)</sup></th>
+            <th>Action</th>
         </tr>
     </thead>
     <tbody>
-        @foreach (var person in @ViewBag.TodayBirthdays)
+        @foreach (var person in Model)
         {
             <tr>
                 <td>@person.FirstName @person.Surname</td>
                 <td>@person.Birthday.ToShortDateString()</td>
                 <td>@person.Age</td>
-            </tr>
-        }
-    </tbody>
-</table>
-<br />
-
-<h3 style="margin-top:25px;">Next's Birthdays</h3>
-<hr />
-<table class="table table-dark table-bordered table-hover table-responsive-sm" style="text-align:center;" width="100%" border="1">
-    <thead>
-        <tr>
-            <th>Name</th>
-            <th>Birthday</th>
-            <th>Age <sup>Year(s)</sup></th>
-        </tr>
-    </thead>
-    <tbody>
-        @foreach (var person in @ViewBag.NextBirthdays)
-        {
-            <tr>
-                <td>@person.FirstName @person.Surname</td>
-                <td>@person.Birthday.ToShortDateString()</td>
-                <td>@person.Age</td>
+                <td>
+                    <a class="btn btn-outline-warning btn-sm" href="/Person/Update?id=@person.Id">Edit</a>
+                    <a class="btn btn-outline-danger btn-sm" href="/Person/Delete?id=@person.Id">Delete</a>
+                </td>
             </tr>
         }
     </tbody>

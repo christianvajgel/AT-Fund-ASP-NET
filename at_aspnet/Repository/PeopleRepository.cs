@@ -20,7 +20,7 @@ namespace at_aspnet.Repository
         {
             using (var connection = new SqlConnection(this.ConnectionString))
             {
-                var sql = @"INSERT INTO PEOPLE(Id,FirstName,Surname,Birthday) VALUES (@P1, @P2, @P3, @P4)";
+                var sql = @"INSERT INTO PEOPLE(Id,FirstName,Surname,Birthday,PersonAge) VALUES (@P1, @P2, @P3, @P4, @P5)";
                 if (connection.State != ConnectionState.Open)
                 {
                     connection.Open();
@@ -31,6 +31,7 @@ namespace at_aspnet.Repository
                 sqlCommand.Parameters.AddWithValue("P2", person.FirstName);
                 sqlCommand.Parameters.AddWithValue("P3", person.Surname);
                 sqlCommand.Parameters.AddWithValue("P4", person.Birthday);
+                sqlCommand.Parameters.AddWithValue("P5", person.Age);
 
                 sqlCommand.ExecuteNonQuery();
                 connection.Close();
@@ -41,7 +42,7 @@ namespace at_aspnet.Repository
         {
             using (var connection = new SqlConnection(this.ConnectionString))
             {
-                var sql = @"UPDATE PEOPLE SET FirstName = @P1, Surname = @P2, Birthday = @P3 WHERE Id = @P4";
+                var sql = @"UPDATE PEOPLE SET FirstName = @P1, Surname = @P2, Birthday = @P3, PersonAge = @P4 WHERE Id = @P5";
 
                 if (connection.State != ConnectionState.Open) { connection.Open(); }
 
@@ -50,7 +51,8 @@ namespace at_aspnet.Repository
                 sqlCommand.Parameters.AddWithValue("P1", person.FirstName);
                 sqlCommand.Parameters.AddWithValue("P2", person.Surname);
                 sqlCommand.Parameters.AddWithValue("P3", person.Birthday);
-                sqlCommand.Parameters.AddWithValue("P4", person.Id);
+                sqlCommand.Parameters.AddWithValue("P4", person.Age);
+                sqlCommand.Parameters.AddWithValue("P5", person.Id);
                 sqlCommand.ExecuteNonQuery();
 
                 connection.Close();
@@ -79,7 +81,7 @@ namespace at_aspnet.Repository
             List<Person> result = new List<Person>();
             using (var connection = new SqlConnection(this.ConnectionString))
             {
-                var sql = @"SELECT ID, FirstName, Surname, Birthday FROM PEOPLE";
+                var sql = @"SELECT ID, FirstName, Surname, Birthday, PersonAge FROM PEOPLE";
                 if (connection.State != ConnectionState.Open)
                 {
                     connection.Open();
@@ -94,13 +96,16 @@ namespace at_aspnet.Repository
                         Id = reader.GetGuid("Id"),
                         FirstName = reader.GetString("FirstName"),
                         Surname = reader.GetString("Surname"),
-                        Birthday = reader.GetDateTime("Birthday")
+                        Birthday = reader.GetDateTime("Birthday"),
+                        Age = reader.GetInt32("PersonAge")
                     };
                     result.Add(person);
                 }
                 connection.Close();
-                return result;
             }
+            // var sortedList = result.OrderBy(x => $"{x.FirstName} {x.Surname}").ToList();
+            
+            return result;
         }
 
         public Person GetById(Guid id)
@@ -108,7 +113,7 @@ namespace at_aspnet.Repository
             List<Person> result = new List<Person>();
             using (var connection = new SqlConnection(this.ConnectionString))
             {
-                var sql = @"SELECT Id, FirstName, Surname, Birthday FROM PEOPLE WHERE Id = @P1";
+                var sql = @"SELECT Id, FirstName, Surname, Birthday, PersonAge FROM PEOPLE WHERE Id = @P1";
                 if (connection.State != ConnectionState.Open)
                 {
                     connection.Open();
@@ -124,7 +129,8 @@ namespace at_aspnet.Repository
                         Id = reader.GetGuid("Id"),
                         FirstName = reader.GetString("FirstName"),
                         Surname = reader.GetString("Surname"),
-                        Birthday = reader.GetDateTime("Birthday")
+                        Birthday = reader.GetDateTime("Birthday"),
+                        Age = reader.GetInt32("PersonAge")
                     };
                     result.Add(person);
                 }
@@ -133,20 +139,20 @@ namespace at_aspnet.Repository
             return result.FirstOrDefault();
         }
 
-        public List<Person> SearchPeople(string firstName, string surname) 
+        public List<Person> SearchPeopleDatabase(string firstName, string surname) 
         {
             List<Person> result = new List<Person>();
             using (var connection = new SqlConnection(this.ConnectionString))
             {
-                var sql = $"SELECT * FROM People WHERE FirstName LIKE '%@P1%' OR Surname LIKE '%@P2%'";
+                var sql = $"SELECT * FROM People WHERE FirstName LIKE @P1 OR Surname LIKE @P2";
                 if (connection.State != ConnectionState.Open)
                 {
                     connection.Open();
                 }
                 SqlCommand sqlCommand = connection.CreateCommand();
                 sqlCommand.CommandText = sql;
-                sqlCommand.Parameters.AddWithValue("P1", firstName);
-                sqlCommand.Parameters.AddWithValue("P2", surname);
+                sqlCommand.Parameters.AddWithValue("P1", '%' + firstName + '%');
+                sqlCommand.Parameters.AddWithValue("P2", '%' + surname + '%');
                 SqlDataReader reader = sqlCommand.ExecuteReader();
                 while (reader.Read())
                 {
@@ -155,7 +161,8 @@ namespace at_aspnet.Repository
                         Id = reader.GetGuid("Id"),
                         FirstName = reader.GetString("FirstName"),
                         Surname = reader.GetString("Surname"),
-                        Birthday = reader.GetDateTime("Birthday")
+                        Birthday = reader.GetDateTime("Birthday"),
+                        Age = reader.GetInt32("PersonAge")
                     };
                     result.Add(person);
                 }

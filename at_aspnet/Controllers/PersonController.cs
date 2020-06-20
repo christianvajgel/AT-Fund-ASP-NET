@@ -15,7 +15,7 @@ namespace at_aspnet.Controllers
         public PersonController(PeopleRepository peopleRepository) { this.PeopleRepository = peopleRepository; }
 
         public static List<Person> People { get; set; } = new List<Person>();
-        public static IEnumerable<Person> ResultList;
+        public static List<Person> ResultList;
 
         public IActionResult Index(string? message, string? type)
         {
@@ -28,9 +28,9 @@ namespace at_aspnet.Controllers
             nextBirthdays = NextBirthdays(this.PeopleRepository.GetAll());
             nextBirthdays.Sort((x, y) => x.Birthday.CompareTo(y.Birthday));
 
-            void TodayBirthdays(List<Person> peopleList) 
+            void TodayBirthdays(List<Person> peopleList)
             {
-                foreach (var p in peopleList) 
+                foreach (var p in peopleList)
                 {
                     if (p.Birthday.Day == DateTime.Now.Day && p.Birthday.Month == DateTime.Now.Month) { todayBirthdays.Add(p); }
                 }
@@ -42,10 +42,11 @@ namespace at_aspnet.Controllers
                 foreach (var p in peopleList)
                 {
                     var date = p.Birthday;
-                    var year = date.Month < DateTime.Now.Month || 
-                               (date.Month == DateTime.Now.Month && date.Day <= DateTime.Now.Day) ? 
+                    var year = date.Month < DateTime.Now.Month ||
+                               (date.Month == DateTime.Now.Month && date.Day <= DateTime.Now.Day) ?
                                     DateTime.Now.Year + 1 : DateTime.Now.Year;
                     p.Birthday = new DateTime(year, date.Month, date.Day);
+                    p.Age = p.Age + 1;
                     result.Add(p);
                 }
                 return result;
@@ -75,14 +76,23 @@ namespace at_aspnet.Controllers
             return View(ResultList);
         }
 
+        public IActionResult List(string? message, string? type) 
+        {
+            ViewBag.message = message;
+            ViewBag.type = type;
+            return View(this.PeopleRepository.GetAll());
+        }
+
         // CREATE
         [HttpPost]
         public IActionResult Save(Person model)
         {
             if (!ModelState.IsValid) { return View(); }
+            var p = model;
             model.Id = Guid.NewGuid();
+            model.Age = CalculateAge(p);
             PeopleRepository.Save(model);
-            return RedirectToAction("Index", "Person", new { message = "Person added.", type = "alert-success" });
+            return RedirectToAction("List", "Person", new { message = "Person added.", type = "alert-success" });
         }
 
         // Save contact and UPDATE
@@ -95,9 +105,10 @@ namespace at_aspnet.Controllers
             updatedPerson.FirstName = model.FirstName;
             updatedPerson.Surname = model.Surname;
             updatedPerson.Birthday = model.Birthday;
+            updatedPerson.Age = CalculateAge(model);
 
             PeopleRepository.Update(updatedPerson);
-            return RedirectToAction("Index", "Person", new { message = "Person edited.", type = "alert-warning" });
+            return RedirectToAction("List", "Person", new { message = "Person edited.", type = "alert-warning" });
         }
 
         // UPDATE - Search for specific person object
@@ -112,9 +123,17 @@ namespace at_aspnet.Controllers
         {
             if (!ModelState.IsValid) { return View(); }
             PeopleRepository.Delete(id);
-            return RedirectToAction("Index", "Person", new { message = "Person deleted.", type = "alert-danger" });
+            return RedirectToAction("List", "Person", new { message = "Person deleted.", type = "alert-danger" });
         }
-        
+
+        private static int CalculateAge(Person person)
+        {
+            var difference = DateTime.Now.Year - person.Birthday.Year;
+            var temp = new DateTime(DateTime.Now.Year, person.Birthday.Month, person.Birthday.Day).Date;
+            if (temp.Date > DateTime.Now.Date) { return (difference - 1); }
+            else { return difference; }
+        }
+
         // Search for person  
         [HttpPost]
         public IActionResult SearchPeople(Person model)
@@ -123,13 +142,9 @@ namespace at_aspnet.Controllers
             return RedirectToAction("Result", "Person", new { message = $"Found {ResultList.Count()} contact(s)", type = "alert-dark" });
         }
 
-        public IEnumerable<Person> SearchFor(string termFirstName, string termSurname)
+        public List<Person> SearchFor(string termFirstName, string termSurname)
         {
-            return People.Where(person =>
-                person.FirstName.Contains(termFirstName, StringComparison.InvariantCultureIgnoreCase) ||
-                person.Surname.Contains(termSurname, StringComparison.InvariantCultureIgnoreCase));
+            return PeopleRepository.SearchPeopleDatabase(termFirstName, termSurname);
         }
-
-        
     }
 }

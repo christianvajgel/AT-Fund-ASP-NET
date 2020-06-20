@@ -5,23 +5,29 @@
 
 @model Person
 
-<h1>Edit Person</h1>
+<h3 style="margin-top: 25px;">Edit </h3><h3 style="font-weight:lighter;">@Model.FirstName @Model.Surname</h3>
+<hr />
 
 <form method="post" asp-action="SaveUpdate" asp-controller="Person" asp-route-id="@Model.Id">
-
-    <div class="form-group">
-        <label for="textFirstName">First name:</label>
-        <input type="text" asp-for="FirstName" />
-        <span asp-validation-for="FirstName"></span>
-
-        <label for="textSurname">Surname:</label>
-        <input type="text" asp-for="Surname" />
-        <span asp-validation-for="Surname"></span>
-
-        <label for="textBirthday">Birthday:</label>
-        <input type="date" asp-for="Birthday" />
-        <span asp-validation-for="Birthday"></span>
+    <div style="text-align: left !important">
+        <table>
+            <tr>
+                <td style="padding: 10px;"><label for="textFirstName">First name:</label></td>
+                <td style="padding: 10px;"><input type="text" asp-for="FirstName" style="font-weight: 600; width: 175px;text-align: center;" /></td>
+                <td style="padding: 10px;"><span asp-validation-for="FirstName"></span></td>
+            </tr>
+            <tr>
+                <td style="padding: 10px;"><label for="textSurname">Surname:</label></td>
+                <td style="padding: 10px;"><input type="text" asp-for="Surname" style="font-weight: 600; width: 175px; text-align: center;" /></td>
+                <td style="padding: 10px;"><span asp-validation-for="Surname"></span></td>
+            </tr>
+            <tr>
+                <td style="padding: 10px;"><label for="textBirthday">Birthday:</label></td>
+                <td style="padding: 10px;"><input type="date" asp-for="Birthday" style="font-weight: 600; width: 175px; text-align: center;" /></td>
+                <td style="padding: 10px;"><span asp-validation-for="Birthday"></span></td>
+            </tr>
+        </table>
+        <br />
+        <button type="submit" class="btn btn-outline-dark btn-sm" style="margin-left: 162px;">Submit</button>
     </div>
-
-    <button type="submit" class="btn btn-outline-dark btn-sm">Submit</button>
 </form>

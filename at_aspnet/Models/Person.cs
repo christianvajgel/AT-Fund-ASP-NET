@@ -18,5 +18,7 @@ namespace at_aspnet.Models
 
         [Required(ErrorMessage = "The person must have a birthdate.")]
         public DateTime Birthday { get; set; }
+
+        public int Age { get; set; }
     }
 }
