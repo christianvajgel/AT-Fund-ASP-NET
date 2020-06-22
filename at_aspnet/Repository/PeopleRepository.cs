@@ -103,8 +103,6 @@ namespace at_aspnet.Repository
                 }
                 connection.Close();
             }
-            // var sortedList = result.OrderBy(x => $"{x.FirstName} {x.Surname}").ToList();
-            
             return result;
         }
 
